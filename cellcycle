@@ -1,0 +1,24 @@
+# cellcycle analysis
+g2m_genes <- cc.genes$g2m.genes ## 获取G2M期marker基因
+g2m_genes <- CaseMatch(search=g2m_genes, match=rownames(Tumorcluster2)) #提取pbmc矩阵中的G2M期marker基因
+s_genes <- cc.genes$s.genes   #获取S期marker基因 
+s_genes <- CaseMatch(search=s_genes, match=rownames(Tumorcluster2)) #提取pbmc矩阵中的S期marker基因 
+#通过提取到的g2m期基因和s期基因，使用CellCycleScoring函数，对pbmc进行细胞周期评分
+Tumorcluster2 <- CellCycleScoring(Tumorcluster2, g2m.features=g2m_genes, s.features=s_genes)
+
+cluster <- subset(Tumorcluster2@meta.data, seurat_clusters == 12)
+
+ggplot(cluster, aes(State, weight = mean, fill = Phase)) +
+  geom_bar(color = "black", width = .7, position = 'fill') +
+  labs( y = 'Relative abundance (%)') +
+  scale_fill_brewer(palette = "Set3")+
+  scale_y_continuous(expand = c(0,0)) +
+  theme_classic()
+
+cluster$Phase <- factor(cluster$Phase, levels = c("S", "G1", "G2M"))
+ggplot(data=cluster, mapping=aes(x=State,fill=Phase))+
+  geom_bar(stat="count",width=0.5,position='fill')+
+  geom_text(stat='count',aes(label=..count..), color="white", size=3.5,position=position_fill(0.5))+
+  generaltheme2()+
+  scale_y_continuous(expand = c(0,0))+
+  scale_fill_d3()
