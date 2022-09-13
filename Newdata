@@ -1,0 +1,201 @@
+library(Seurat)
+library(wesanderson)
+fileid <- list.files("./Data")
+fileid <- paste("./Data/", fileid, sep = "")
+gf <-  gzfile(fileid[1])
+P1 <-  read.table(gf, header = T, sep = "\t")
+P1 <- MergeGeneId(P1)
+
+
+gf <-  gzfile(fileid[2])
+P2 <-  read.table(gf, header = T, sep = "\t")
+P2 <- MergeGeneId(P2)
+
+gf <-  gzfile(fileid[3])
+P3 <-  read.table(gf, header = T, sep = "\t")
+P3 <- MergeGeneId(P3)
+
+
+testD.seu=CreateSeuratObject(counts = P1,
+                             min.cells = 10, 
+                             min.features = 200,
+                             project = "P1"
+)
+testE.seu=CreateSeuratObject(counts = P2,
+                             min.cells = 10, 
+                             min.features = 200,
+                             project = "P2"
+)
+testF.seu=CreateSeuratObject(counts = P3,
+                             min.cells = 10, 
+                             min.features = 200,
+                             project = "P3"
+)
+
+# testD.seu filter doublet
+testD.seu <- PercentageFeatureSet(testD.seu, pattern = "^MT-", col.name = "percent.mt")
+testD.seu <- subset(testD.seu, percent.mt < 10)
+testD.seu <- NormalizeData(testD.seu, normalization.method = "LogNormalize", scale.factor = 10000)
+testD.seu <- FindVariableFeatures(testD.seu, selection.method = "vst", nfeatures = 2000)
+testD.seu <- ScaleData(testD.seu)
+testD.seu <- RunPCA(testD.seu, verbose = F, dims = 1:30)
+ElbowPlot(testD.seu)
+pc.num=1:16
+testD.seu <- RunUMAP(testD.seu, dims=pc.num)
+testD.seu <- FindNeighbors(testD.seu, dims = pc.num) %>% FindClusters(resolution = 0.8)
+# Delete doublet
+sweep.res.list <- paramSweep_v3(testD.seu, PCs = pc.num, sct = F)
+sweep.stats <- summarizeSweep(sweep.res.list, GT = FALSE)  
+bcmvn <- find.pK(sweep.stats)
+pK_bcmvn <- bcmvn$pK[which.max(bcmvn$BCmetric)] %>% as.character() %>% as.numeric()
+
+## 排除不能检出的同源doublets，优化期望的doublets数量
+DoubletRate = 0.035                    # 5000细胞对应的doublets rate是3.9%
+homotypic.prop <- modelHomotypic(testD.seu$seurat_clusters)   # 最好提供celltype
+nExp_poi <- round(DoubletRate*ncol(testD.seu)) 
+nExp_poi.adj <- round(nExp_poi*(1-homotypic.prop))
+testD.seu <- doubletFinder_v3(testD.seu, PCs = pc.num, pN = 0.25, pK = pK_bcmvn, 
+                              nExp = nExp_poi.adj, reuse.pANN = F, sct = F)
+summary(testD.seu@meta.data)
+#DimPlot(testD.seu, reduction = "umap", group.by = colnames(testE.seu@meta.data[8]))
+#数据的过滤
+testD.seu <- subset(testD.seu, subset = DF.classifications_0.25_0.17_135 == "Singlet")
+
+# testE.seu filter doublet
+testE.seu <- PercentageFeatureSet(testE.seu, pattern = "^MT-", col.name = "percent.mt")
+testE.seu <- subset(testE.seu, percent.mt < 10)
+testE.seu <- NormalizeData(testE.seu, normalization.method = "LogNormalize", scale.factor = 10000)
+testE.seu <- FindVariableFeatures(testE.seu, selection.method = "vst", nfeatures = 2000)
+testE.seu <- ScaleData(testE.seu)
+testE.seu <- RunPCA(testE.seu, verbose = F, dims = 1:30)
+ElbowPlot(testE.seu)
+pc.num=1:16
+testE.seu <- RunUMAP(testE.seu, dims=pc.num)
+testE.seu <- FindNeighbors(testE.seu, dims = pc.num) %>% FindClusters(resolution = 0.8)
+# Delete doublet
+sweep.res.list <- paramSweep_v3(testE.seu, PCs = pc.num, sct = F)
+sweep.stats <- summarizeSweep(sweep.res.list, GT = FALSE)  
+bcmvn <- find.pK(sweep.stats)
+pK_bcmvn <- bcmvn$pK[which.max(bcmvn$BCmetric)] %>% as.character() %>% as.numeric()
+dim(testE.seu@meta.data)
+## 排除不能检出的同源doublets，优化期望的doublets数量
+DoubletRate = 0.002                    # 5000细胞对应的doublets rate是3.9%
+homotypic.prop <- modelHomotypic(testE.seu$seurat_clusters)   # 最好提供celltype
+nExp_poi <- round(DoubletRate*ncol(testE.seu)) 
+nExp_poi.adj <- round(nExp_poi*(1-homotypic.prop))
+testE.seu <- doubletFinder_v3(testE.seu, PCs = pc.num, pN = 0.25, pK = pK_bcmvn, 
+                              nExp = nExp_poi.adj, reuse.pANN = F, sct = F)
+summary(testE.seu@meta.data)
+#DimPlot(testE.seu, reduction = "umap", group.by = colnames(testE.seu@meta.data[8]))
+#数据的过滤
+testE.seu <- subset(testE.seu, subset = DF.classifications_0.25_0.16_4 == "Singlet")
+
+##########################################################################
+# testF.seu filter doublet
+testF.seu <- PercentageFeatureSet(testF.seu, pattern = "^MT-", col.name = "percent.mt")
+testF.seu <- subset(testF.seu, percent.mt < 10)
+testF.seu <- NormalizeData(testF.seu, normalization.method = "LogNormalize", scale.factor = 10000)
+testF.seu <- FindVariableFeatures(testF.seu, selection.method = "vst", nfeatures = 2000)
+testF.seu <- ScaleData(testF.seu)
+testF.seu <- RunPCA(testF.seu, verbose = F, dims = 1:30)
+ElbowPlot(testF.seu)
+pc.num=1:16
+testF.seu <- RunUMAP(testF.seu, dims=pc.num)
+testF.seu <- FindNeighbors(testF.seu, dims = pc.num) %>% FindClusters(resolution = 0.8)
+# Delete doublet
+sweep.res.list <- paramSweep_v3(testF.seu, PCs = pc.num, sct = F)
+sweep.stats <- summarizeSweep(sweep.res.list, GT = FALSE)  
+bcmvn <- find.pK(sweep.stats)
+pK_bcmvn <- bcmvn$pK[which.max(bcmvn$BCmetric)] %>% as.character() %>% as.numeric()
+dim(testF.seu@meta.data)
+## 排除不能检出的同源doublets，优化期望的doublets数量
+DoubletRate = 0.02                   # 5000细胞对应的doublets rate是3.9%
+homotypic.prop <- modelHomotypic(testF.seu$seurat_clusters)   # 最好提供celltype
+nExp_poi <- round(DoubletRate*ncol(testF.seu)) 
+nExp_poi.adj <- round(nExp_poi*(1-homotypic.prop))
+testF.seu <- doubletFinder_v3(testF.seu, PCs = pc.num, pN = 0.25, pK = pK_bcmvn, 
+                              nExp = nExp_poi.adj, reuse.pANN = F, sct = F)
+summary(testF.seu@meta.data)
+#DimPlot(testF.seu, reduction = "umap", group.by = "DF.classifications_0.25_0.15_126")
+#数据的过滤
+testF.seu <- subset(testF.seu, subset = DF.classifications_0.25_0.25_46 == "Singlet")
+
+
+
+
+object.list = list(Guoshaozhou1119_S = testA.seu,
+                   SJ211.19_S = testB.seu,
+                   ZMM_S = testC.seu,
+                   P1 = testD.seu,
+                   P2 = testE.seu,
+                   P3 = testF.seu
+)
+
+anchors <- FindIntegrationAnchors(object.list, dims = 1:30)
+NewMerge <- IntegrateData(anchorset = anchors, dims = 1:30)
+
+# Analysis with corrected value
+DefaultAssay(NewMerge) <- "integrated"
+
+################################################################################
+## Run the standard workflow for visualization and clustering
+################################################################################
+
+NewMerge <- ScaleData(NewMerge)
+NewMerge <- RunPCA(NewMerge,verbose = FALSE)
+ElbowPlot(NewMerge,ndims = 50)
+NewMerge <- RunUMAP(NewMerge, dims = 1:30)
+NewMerge <- FindNeighbors(NewMerge, dims = 1:30)
+NewMerge <- FindClusters(NewMerge, resolution = 0.8)
+
+
+library(ggplot2)
+fill_colors <- c("#20B2AA", "#CD4F39", "#EE3A8C", "#FFA54F", "#6CA6CD", 
+                 "#6959CD", "#C6E2FF", "#008B00", "#FF7F00", "#B452CD", 
+                 "#436EEE", "#9BCD9B", "#F08080", "#FF3030", "#FFEC8B", 
+                 "#AB82FF", "#9ACD32", "#636363", "#B8860B", "#5D478B", 
+                 "#8B3626", "#FF6347", "#40E0D0","#FFFF00")
+table(Idents(test.integrated),test.integrated$orig.ident)
+# Seurat_clusters
+DimPlot(NewMerge, reduction = "umap", label = TRUE)+
+  scale_fill_manual(values = fill_colors) +
+  scale_color_manual(values = fill_colors, guide = FALSE)
+# Patient
+DimPlot(NewMerge, reduction = "umap",group.by = "orig.ident")+
+  scale_fill_manual(values = fill_colors) +
+  scale_color_manual(values = fill_colors, guide = FALSE)
+
+
+testdf <- merge(object.list[[1]], object.list[2:length(object.list)])
+# 使用Harmony进行数据的整合
+# cbind with counts Data
+table(testdf$orig.ident)
+
+testdf <- testdf %>%
+  Seurat::NormalizeData() %>%
+  FindVariableFeatures(selection.method = "vst", nfeatures = 2000) %>% 
+  ScaleData()
+testdf <- RunPCA(testdf, npcs = 50, verbose = FALSE)
+testdf <- testdf %>% 
+  RunHarmony("orig.ident", plot_convergence = TRUE)
+testdf <- RunUMAP(testdf, reduction = "harmony", dims = 1:30)
+testdf <- FindNeighbors(testdf, dims = 1:30)
+testdf <- FindClusters(testdf, resolution = 0.5)
+# Seurat_clusters
+DimPlot(test.merge, reduction = "umap", label = TRUE)+
+  scale_fill_manual(values = fill_colors) +
+  scale_color_manual(values = fill_colors, guide = FALSE)
+# Patient
+DimPlot(test.merge, reduction = "umap",group.by = "CellType")+
+  scale_fill_manual(values = fill_colors) +
+  scale_color_manual(values = fill_colors, guide = FALSE)
+
+
+
+aa <- table(Idents(Immunecluster),Immunecluster$orig.ident)
+
+bb <- apply(aa, 2, sum)
+for (i in 1:length(bb)) {
+  aa[ ,i] <- aa[ ,i] / bb[i]
+}
+signif(aa, 4)
