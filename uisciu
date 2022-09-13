@@ -1,0 +1,78 @@
+saveRDS(Tumorcluster, file = "Tumorcluster.rds")
+saveRDS(Immunecluster, file = "Immunecluster.rds")
+
+
+data <- fetch.gene.exp(Tumorcluster2, c("VEGFA","HIF1A"), c("State", "seurat_clusters"))
+
+data <- subset(data, gene == "HIF1A")
+
+
+Seurat.Boxplot(data, "seurat_clusters", "State", selectexp = T)+
+  theme_bw()+
+  guides(color = guide_legend(title = "State"))+
+  xlab("Seurat clusters")+
+  ylab("HIF1A expression level")+
+  scale_color_aaas()+
+  stat_compare_means(method = "wilcox.test", label = "p.signif", show.legend=FALSE, hide.ns = T)
+
+
+
+
+ggplot(Tumorcluster2@meta.data, aes(x = reorder(seurat_clusters, MGMT_Features1),y = MGMT_Features1, color = State))+
+  geom_boxplot()+ 
+  #guides(color = "none")+
+  ylab("Expression level")+
+  # geom_jitter(aes(x = gene, y = expression, color = group), position = position_jitterdodge())+
+  theme_bw()+
+  scale_color_aaas()
+
+
+
+
+pheno <- data.frame(Tumorcluster2@meta.data[ ,c("State", "seurat_clusters")], 
+                    t(as.data.frame(Tumorcluster2@assays$RNA@data[c("VEGFA","HIF1A"), rownames(Tumorcluster2@meta.data)])))
+colnames(pheno)[1:length(c("State", "seurat_clusters"))] <- c("State", "seurat_clusters")
+data <- list()
+for(i in c("VEGFA","HIF1A")){
+  i <- gsub("-", ".", i)
+  now.data <- data.frame(pheno[ ,c("State", "seurat_clusters")], pheno[ ,colnames(pheno) == i])
+  colnames(now.data)[length(c("State", "seurat_clusters")) + 1] = 'expression'
+  now.data$gene <- i
+  data[[i]] = now.data
+}
+data <- Reduce(rbind, data)
+colnames(data)[1:length(vars)] <- vars
+return(data)
+
+
+
+
+
+
+
+
+VlnPlot(subset(Tumorcluster2, MGMT > 0), features = "MGMT", split.by = "State")+
+  stat_compare_means(method = "wilcox.test", label = "p.signif", show.legend=FALSE, hide.ns = T)+
+  theme_bw()+
+  xlab("Seurat clusters")+
+  ylab("MGMT expression level")
+
+
+
+
+Idents(Tumorcluster2) <- "celltype2"
+
+
+TumorclustercelltypeMarkers <- FindAllMarkers(Tumorcluster2, only.pos = TRUE, min.pct = 0.25, logfc.threshold = 0.25)
+write.table(TumorclustercelltypeMarkers, 
+            file="TumorclustercelltypeMarkers.txt", 
+            sep = '\t', 
+            row.names = TRUE, 
+            col.names = TRUE, 
+            quote = FALSE)
+
+
+
+
+
+
