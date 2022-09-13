@@ -1,0 +1,676 @@
+
+library(Nebulosa)
+
+plot_density(Tumorcluster2, reduction = "umap", "SPARCL1")+
+  generaltheme1()+ ggtitle("Radila glia")+ theme(plot.title = element_text(hjust = 0.5)) 
+
+
+
+
+plot_density(Tumorcluster2, reduction = "umap", c("SCG3","PDGFRA"),joint = TRUE)[[3]]+
+  generaltheme1()+ ggtitle("OPC")+ theme(plot.title = element_text(hjust = 0.5)) 
+
+
+
+
+
+FeaturePlot(Tumorcluster2,  reduction = "umap", "SPARCL1")+
+  generaltheme1()+ ggtitle("SPARCL1(Radila glia)")+ theme(plot.title = element_text(hjust = 0.5))
+
+
+
+
+
+
+
+
+
+
+
+
+
+plot_density(Tumorcluster2, reduction = "umap", c("CD4","CD8A"),joint = TRUE)+
+  generaltheme1()+ ggtitle("Radila glia")+ theme(plot.title = element_text(hjust = 0.5)) 
+plot_density(Tumorcluster2, reduction = "umap", c("CD4","CD8A"),joint = TRUE)+
+  generaltheme1()+ ggtitle("Radila glia")+ theme(plot.title = element_text(hjust = 0.5)) 
+plot_density(Tumorcluster2, reduction = "umap", c("CD4","CD8A"),joint = TRUE)+
+  generaltheme1()+ ggtitle("Radila glia")+ theme(plot.title = element_text(hjust = 0.5)) 
+plot_density(Tumorcluster2, reduction = "umap", c("CD4","CD8A"),joint = TRUE)+
+  generaltheme1()+ ggtitle("Radila glia")+ theme(plot.title = element_text(hjust = 0.5)) 
+plot_density(Tumorcluster2, reduction = "umap", c("CD4","CD8A"),joint = TRUE)+
+  generaltheme1()+ ggtitle("Radila glia")+ theme(plot.title = element_text(hjust = 0.5)) 
+plot_density(Tumorcluster2, reduction = "umap", c("CD4","CD8A"),joint = TRUE)+
+  generaltheme1()+ ggtitle("Radila glia")+ theme(plot.title = element_text(hjust = 0.5)) 
+plot_density(Tumorcluster2, reduction = "umap", c("CD4","CD8A"),joint = TRUE)+
+  generaltheme1()+ ggtitle("Radila glia")+ theme(plot.title = element_text(hjust = 0.5)) 
+
+
+
+
+
+
+
+plot_density(scedata, c("CD4","CD8A"),joint = TRUE)
+
+
+
+# All
+DimPlot(Tumorcluster2, reduction = "umap", label = F, group.by = "celltype2")+
+  generaltheme1()+
+  Tumorcellcolor(1)
+  
+  
+p = ggplot(Tumorcluster2@meta.data, aes(x = Var1,y = Freq,fill = Var2))+
+  ####position="stack"堆叠状
+  geom_bar(stat ="identity",width = 0.6,position ="stack")+     
+
+  
+  scale_color_manual(values = c("#79CDCD","#45a776","#f05326","#eed777","#334f65","#b3974e",
+                                "#38cb7d","#ddae33","#844bb3","#93c555","#5f6694","#df3881",
+                                "#0780cf","#765005","#fa6d1d","#0e2c82","#90ed7d","#da1f18",
+                                "#701866","#f47a75","#009db2","#024b51","#63b2ee","#76da91",
+                                "#f8cb7f","#f89588","#7cd6cf","#9192ab","#7898e1","#efa666",
+                                "#eddd86","#9987ce","#90ed7d"))
+  
+
+
+
+
+
+
+  
+   scale_color_manual(values = c("#79CDCD","#45a776","#f05326","#eed777","#334f65","#b3974e",
+                                "#38cb7d","#ddae33","#844bb3","#93c555","#5f6694","#df3881",
+                                "#0780cf","#765005","#fa6d1d","#0e2c82","#90ed7d","#da1f18",
+                                "#701866","#f47a75","#009db2","#024b51","#63b2ee","#76da91",
+                                "#f8cb7f","#f89588","#7cd6cf","#9192ab","#7898e1","#efa666",
+                                "#eddd86","#9987ce","#90ed7d"))
+  
+  
+  scale_color_manual(values = c("#F6B766", "#CEC5E1", "#FAF2B9", "#90B4D2", "#EF8378","#CADD68"))
+
+  Tumorcluster2$patientID <- "id"
+  Tumorcluster2$patientID[Tumorcluster2$orig.ident == "Guoshaozhou1119_S"] <- "PA1"
+  Tumorcluster2$patientID[Tumorcluster2$orig.ident == "SJ_S"] <- "PA2"
+  Tumorcluster2$patientID[Tumorcluster2$orig.ident == "SJ211.19_S"] <- "PA3"
+  Tumorcluster2$patientID[Tumorcluster2$orig.ident == "SF11644"] <- "PA4"
+  Tumorcluster2$patientID[Tumorcluster2$orig.ident == "SF11956"] <- "PA5"
+  Tumorcluster2$patientID[Tumorcluster2$orig.ident == "SF11979"] <- "PA6"
+
+  Tumorcluster2$State <- "state"
+Tumorcluster2$State[Tumorcluster2$patientID == "PA1" | Tumorcluster2$patientID == "PA2" | Tumorcluster2$patientID == "PA3"] <- "Relapse"
+Tumorcluster2$State[Tumorcluster2$patientID == "PA4" | Tumorcluster2$patientID == "PA5" | Tumorcluster2$patientID == "PA6"] <- "Primary"
+
+  
+  scale_color_manual(values = c("#79CDCD","#45a776","#f05326","#eed777","#334f65","#b3974e",
+                                "#38cb7d","#ddae33","#844bb3","#93c555","#5f6694","#df3881",
+                                "#0780cf","#765005","#fa6d1d","#0e2c82","#90ed7d","#da1f18",
+                                "#701866","#f47a75","#009db2","#024b51","#63b2ee","#76da91",
+                                "#f8cb7f","#f89588","#7cd6cf","#9192ab","#7898e1","#efa666",
+                                "#eddd86","#9987ce","#90ed7d"))
+DotPlot(Merge, features = "PTPRC")
+DotPlot(Merge, features = "EPCAM")
+
+Merge$celltype1 <- "Tumor cell"
+# 18 20 Endothelial
+Merge$celltype1[Merge$seurat_clusters == 18] <- "Endothelial cell"
+Merge$celltype1[Merge$seurat_clusters == 20] <- "Endothelial cell"
+# 1 2 8 17 21 Immune
+Merge$celltype1[Merge$seurat_clusters == 1] <- "Immune cell"
+Merge$celltype1[Merge$seurat_clusters == 2] <- "Immune cell"
+Merge$celltype1[Merge$seurat_clusters == 8] <- "Immune cell"
+Merge$celltype1[Merge$seurat_clusters == 17] <- "Immune cell"
+Merge$celltype1[Merge$seurat_clusters == 21] <- "Immune cell"
+#  Tumor cells
+Tumorcell <- subset(Merge, celltype1 == "Tumor cell")
+Immunecell <- subset(Merge, celltype1 == "Immune cell")
+
+
+
+
+
+
+
+
+
+
+
+
+# 标准流程
+# workflow
+Tumorcell <- NormalizeData(Tumorcell, normalization.method = "LogNormalize", scale.factor = 10000)
+Tumorcell <- FindVariableFeatures(Tumorcell, selection.method = "vst", nfeatures = 2000)
+Tumorcell <- ScaleData(Tumorcell)
+Tumorcell <- RunPCA(Tumorcell,verbose = FALSE)
+ElbowPlot(Tumorcell,ndims = 30)
+Tumorcell <- RunUMAP(Tumorcell, dims = 1:30)
+Tumorcell <- FindNeighbors(Tumorcell, dims = 1:30)
+Tumorcell <- FindClusters(Tumorcell, resolution = 0.7)
+DimPlot(Tumorcell, reduction = "umap", label = T, group.by = "orig.ident")+
+  scale_color_manual(values = c("#79CDCD","#45a776","#f05326","#eed777","#0780cf","#b3974e",
+                                "#38cb7d","#ddae33","#844bb3","#93c555","#5f6694","#df3881",
+                                "#0780cf","#765005","#fa6d1d","#0e2c82","#b6b51f","#da1f18",
+                                "#701866","#f47a75","#009db2","#024b51","#63b2ee","#76da91",
+                                "#f8cb7f","#f89588","#7cd6cf","#9192ab","#7898e1","#efa666",
+                                "#eddd86","#9987ce","#90ed7d"))
+DotPlot(Tumorcell, features = c("SOX2"))
+
+
+
+
+DimPlot(Merge, reduction = "umap", label = T, group.by = "orig.ident")+
+  scale_color_manual(values = c("#79CDCD","#45a776","#f05326","#eed777","#0780cf","#b3974e",
+                                "#38cb7d","#ddae33","#844bb3","#93c555","#5f6694","#df3881",
+                                "#0780cf","#765005","#fa6d1d","#0e2c82","#b6b51f","#da1f18",
+                                "#701866","#f47a75","#009db2","#024b51","#63b2ee","#76da91",
+                                "#f8cb7f","#f89588","#7cd6cf","#9192ab","#7898e1","#efa666",
+                                "#eddd86","#9987ce","#90ed7d"))
+
+
+# 去除核糖体簇
+Tumorcluster2 <- subset(Tumorcluster2, seurat_clusters != 5)
+
+
+
+
+DefaultAssay(Tumorcluster) <- "RNA"
+
+Tumorcluster2 <- subset(Tumorcluster, PTPRC <= 0)
+
+Tumorcluster2 <- NormalizeData(Tumorcluster2, normalization.method = "LogNormalize", scale.factor = 10000)
+Tumorcluster2 <- FindVariableFeatures(Tumorcluster2, selection.method = "vst", nfeatures = 2000)
+Tumorcluster2 <- ScaleData(Tumorcluster2)
+Tumorcluster2 <- RunHarmony(Tumorcluster2, "orig.ident")
+Tumorcell <- RunPCA(Tumorcell,verbose = FALSE)
+ElbowPlot(Tumorcluster2,ndims = 30)
+Tumorcluster2 <- RunUMAP(Tumorcluster2, dims = 1:21)
+Tumorcluster2 <- FindNeighbors(Tumorcluster2, dims = 1:21)
+Tumorcluster2 <- FindClusters(Tumorcluster2, resolution = 0.7)
+
+
+
+Tumorcluster2 <- Tumorcluster2 %>% 
+  RunUMAP(reduction = "harmony", dims = 1:21) %>% 
+  FindNeighbors(reduction = "harmony", dims = 1:21) %>% 
+  FindClusters(resolution = 0.7)
+
+
+
+Tumorcluster2$cliType <- "recurrence"
+Tumorcluster2$cliType[which(Tumorcluster2$orig.ident %in% c("SF11644","SF11956","SF11979"))] <- "primary"
+
+for (i in 6:16) {
+  Tumorcluster2$seurat_clusters[Tumorcluster2$seurat_clusters == i] <- i-1
+}
+Tumorcluster2$seurat_clusters[Tumorcluster2$seurat_clusters == 6] <- 5
+
+
+
+DimPlot(Tumorcluster2, reduction = "umap", label = T, group.by = "seurat_clusters")+
+  scale_color_manual(values = c("#79CDCD","#45a776","#f05326","#eed777","#0780cf","#b3974e",
+                                "#38cb7d","#ddae33","#844bb3","#93c555","#5f6694","#df3881",
+                                "#0780cf","#765005","#fa6d1d","#0e2c82","#b6b51f","#da1f18",
+                                "#701866","#f47a75","#009db2","#024b51","#63b2ee","#76da91",
+                                "#f8cb7f","#f89588","#7cd6cf","#9192ab","#7898e1","#efa666",
+                                "#eddd86","#9987ce","#90ed7d"))
+
+DimPlot(Merge, reduction = "umap", label = T, group.by = "celltype1")+
+  scale_color_manual(values = c("#79CDCD","#45a776","#f05326","#eed777","#0780cf","#b3974e",
+                                "#38cb7d","#ddae33","#844bb3","#93c555","#5f6694","#df3881",
+                                "#0780cf","#765005","#fa6d1d","#0e2c82","#b6b51f","#da1f18",
+                                "#701866","#f47a75","#009db2","#024b51","#63b2ee","#76da91",
+                                "#f8cb7f","#f89588","#7cd6cf","#9192ab","#7898e1","#efa666",
+                                "#eddd86","#9987ce","#90ed7d"))
+
+DefaultAssay(Merge) <- "RNA"
+FeaturePlot(Merge, features = c("ATRX","IDH1","P53","PARP1","GFAP","KI-67","EGFR2","TJP1"))
+
+
+VlnPlot(Tumorcluster2, features = c("TRPV1"), group.by = "cliType")
+
+
+
+DotPlot(Tumorcluster2, features = Immature_Astrocyte)
+FeaturePlot(Tumorcluster2, features = c("TNFRSF12A"))
+
+
+
+
+
+
+
+
+
+VlnPlot(Tumorcluster2, features = c("SOX2"), group.by = "cliType")+
+  stat_compare_means(label = 'p.signif', hide.ns = T)
+
+
+
+saveRDS(Tumorcluster2,"Tumorcluster.rds")
+
+
+TumorclusterMarkers <- FindAllMarkers(Tumorcluster2, only.pos = TRUE, min.pct = 0.25, logfc.threshold = 0.25)
+
+
+
+# Immature_Astrocyte
+
+
+
+# Astrocyte >>>>>>>>> 2 12
+Astrocyte_features <- c("UBE2C","CENPF","TOP2A","SMC2")
+FeaturePlot(Tumorcluster2, reduction = 'umap', features = Oligodendrocyte)
+DotPlot(Tumorcluster2, features = Radila_Glia,
+          group.by = "seurat_clusters")
+
+# Microglia 15
+
+# Dividing OPC  7 10 13 dIVIDING nEURON
+
+# CGEin 9 14
+
+# MatureIPC_NewbornNeuron 9
+
+# Oligodendrocyte 0 
+
+# OPC 1 3 
+
+# Immature_Astrocyte 4
+
+# Radila_Glia 16  11
+
+# Astrocyte 2 12 6 8
+
+
+
+
+Tumorcluster2$celltype2 <- "cell"
+
+Tumorcluster2$celltype2[Tumorcluster2$seurat_clusters == 0] <- "Oligodendrocyte"
+Tumorcluster2$celltype2[Tumorcluster2$seurat_clusters == 1] <- "OPC"
+Tumorcluster2$celltype2[Tumorcluster2$seurat_clusters == 2] <- "Astrocyte"
+Tumorcluster2$celltype2[Tumorcluster2$seurat_clusters == 3] <- "OPC"
+Tumorcluster2$celltype2[Tumorcluster2$seurat_clusters == 4] <- "Immature astrocyte"
+Tumorcluster2$celltype2[Tumorcluster2$seurat_clusters == 5] <- "Astrocyte"
+Tumorcluster2$celltype2[Tumorcluster2$seurat_clusters == 6] <- "Dividing OPC"
+Tumorcluster2$celltype2[Tumorcluster2$seurat_clusters == 7] <- "Astrocyte"
+Tumorcluster2$celltype2[Tumorcluster2$seurat_clusters == 8] <- "MatureIPC newborn neuron"
+ Tumorcluster2$celltype2[Tumorcluster2$seurat_clusters == 9] <- "Dividing OPC"
+ Tumorcluster2$celltype2[Tumorcluster2$seurat_clusters == 10] <- "Radila glia"
+ Tumorcluster2$celltype2[Tumorcluster2$seurat_clusters == 11] <- "Astrocyte"
+ Tumorcluster2$celltype2[Tumorcluster2$seurat_clusters == 12] <- "Dividing OPC"
+ Tumorcluster2$celltype2[Tumorcluster2$seurat_clusters == 13] <- "CGEin"
+ Tumorcluster2$celltype2[Tumorcluster2$seurat_clusters == 14] <- "Microglia"
+ Tumorcluster2$celltype2[Tumorcluster2$seurat_clusters == 15] <- "Radila glia"
+
+c("GPR17", "SIRT2", "RAB33A", "FERMT1", "TMEM108", "BCAS1", "APCDD1", "EPHB1", "PLPPR1", "PHYHIPL", "FGF12", "APOD", "CADM2", "TUBB4A", "TNR", "SERINC5", "CNP", "ATCAY", "UGT8", "GNAI1", "FYN", "WASF1", "HRASLS", "SLC44A1", "AFMID", "SGK1", "PFN2", "SMOC1", "DYNLL1", "ENPP6", "TUBA1A", "PRDX1")
+
+
+
+Oligodendrocyte = c("PTPRC","TF","MAG","CLDN11","ERMN")
+
+OPC = c("BEX1","PCSK1N","OLIG1","PDGFRA","APOD","SCG3","RBP1")
+Dividing_OPC = c("UBE2C","CENPF","TOP2A","SMC2")
+Microglia = c("C1QC","FCGBP","C1QB","C1QA","CCL3")
+TAM = c("LYZ","THBS1","GPNMB","SLC16A10","C5AR1")
+CGEin = c("SIX3","MIAT","ISL1","INA","NR2F2")
+Neuron = c("SOX4","STMN1","TUBB","TUBA1A","HMGB1")
+Dividing_Neuron = c("TOP2A","NUSAP1","CENPF","HMGB2","PTTG1")
+Glycolytic_progenitor = c("VIM","LGALS1","GADPH","MALAT1","FTL")
+Immature_Astrocyte = c("CPE","HOPX","CLU","CST3","AQP4")
+Pericyte = c("LY6H","PRELP","BGN","MXRA5","COL6A2")
+Endothelial = c("SEPT14","NDUFA4L2","IGFBP5","TPD52L1","EGFR")
+Radila_Glia = c("CHI3L1","UBLCP1","NNMT","EMP3","SPARCL1")
+Dividing_progenitor = c("PBK","BIRC5","TOP2A","UBE2C","MKI67")
+Mixed_progenitor = c("PTPR21","NRCAM","GAP43","CHL1","APP")
+Oligodendrocyte = c("PLP1","TF","MAG","CLDN11","ERMN")
+MatureIPC_NewbornNeuron = c("CRABP1","NHLH1","ELAVL2","ELAVL4","SYT1")
+
+
+
+
+
+
+
+DotPlot(Tumorcluster2, features = c("SPARCL1",
+                                    "SCG3","PDGFRA",
+                                    "PLP1","TF", # Oligo
+                                    "C1QA","C1QB", # Microglia
+                                    "ELAVL4","SYT1", # MatureIPC_NewbornNeuron
+                                    "AQP4","CPE",
+                                    "TOP2A","NUSAP1",
+                                    "MIAT",
+                                    "GFAP","CCNB1"
+                                    ), group.by = "celltype2")+
+  generaltheme1()+
+  theme(axis.text.x = element_text(angle = 45, hjust = 0.5, vjust = 0.5))
+
+
+
+
+DotPlot(Tumorcluster2, features = c("CCNB1",
+                                    "CDKN3",
+                                    "TPX2",
+                                    "DLGAP5",
+                                    "CENPE",
+                                    "CDC20",
+                                    "CCNB2",
+                                    "TTK",
+                                    "ECT2",
+                                    "BUB1",
+                                    "HMMR",
+                                    "AURKA",
+                                    "GTSE1",
+                                    "CDCA8",
+                                    "KIF2C",
+                                    "UBE2S",
+                                    "CDKN1A"
+))+
+  generaltheme1()
+
+
+
+Tumorcluster
+
+OPC_fea <- c("SCG3","PDGFRA","RBP1")
+DotPlot(Tumorcluster, features = c("SCG3","PDGFRA","RBP1"))
+
+Tumor <- subset(Tumorcluster, PTPRC <= 0)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Myeloidmarkers <- FindAllMarkers(Tumorcell, only.pos = TRUE, min.pct = 0.25, logfc.threshold = 0.25)
+write.table(Myeloidmarkers, file="Myeloidmarkers.txt", sep = '\t', row.names = FALSE, col.names = T, quote = FALSE)
+
+Immunecell <- NormalizeData(Immunecell, normalization.method = "LogNormalize", scale.factor = 10000)
+Immunecell <- FindVariableFeatures(Immunecell, selection.method = "vst", nfeatures = 2000)
+Immunecell <- ScaleData(Immunecell)
+Immunecell <- RunPCA(Immunecell,verbose = FALSE)
+ElbowPlot(Immunecell,ndims = 30)
+Immunecell <- RunUMAP(Immunecell, dims = 1:30)
+Immunecell <- FindNeighbors(Immunecell, dims = 1:30)
+Immunecell <- FindClusters(Immunecell, resolution = 0.7)
+
+Myeloidmarkers <- FindAllMarkers(Immunecell, only.pos = TRUE, min.pct = 0.25, logfc.threshold = 0.25)
+write.table(Myeloidmarkers, file="Myeloidmarkers.txt", sep = '\t', row.names = FALSE, col.names = T, quote = FALSE)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+hypoxia <- list(hypoxia = c("ARNT", "EIF1", "EIF1AX", "EIF2B1", "EIF2B2", "EIF2B3", "EIF2B4", "EIF2B5", "EIF2S1", "EIF2S2", "EIF2S3", "ELAVL1", "FLT1", "FLT4", "HIF1A", "HRAS", "KDR", "NOS3", "PIK3CA", "PIK3CG", "PIK3R1", "PLCG1", "PRKCA", "PRKCB", "SHC1", "VEGFA", "VHL"))
+
+Tumorcluster2 <- AddModuleScore(
+  object = Tumorcluster2,
+  features = hypoxia,
+  ctrl = 100, #默认值是100
+  name = 'hypoxia_Features'
+)
+
+
+VlnPlot(subset(Tumorcluster2, VEGFA > 0), features = "VEGFA", split.by = "State")
+
+
+
+DimPlot(Tumorcluster2)+
+  generaltheme1()+
+  scale_color_manual(values = c("#79CDCD","#45a776","#f05326","#eed777","#0780cf","#b3974e",
+                                "#38cb7d","#ddae33","#844bb3","#93c555","#5f6694","#df3881",
+                                "#0780cf","#765005","#fa6d1d","#0e2c82","#b6b51f","#da1f18",
+                                "#701866","#f47a75","#009db2","#024b51","#63b2ee","#76da91",
+                                "#f8cb7f","#f89588","#7cd6cf","#9192ab","#7898e1","#efa666",
+                                "#eddd86","#9987ce","#90ed7d"))
+
+
+
+
+
+library(MySeuratWrappers)
+
+VlnPlot(Tumorcluster2, features = c("SPARCL1",
+                          "SCG3","PDGFRA",
+                          "PLP1","TF", # Oligo
+                          "C1QA","C1QB", # Microglia
+                          "ELAVL4","SYT1", # MatureIPC_NewbornNeuron
+                          "AQP4","CPE",
+                          "TOP2A","NUSAP1",
+                          "MIAT",
+                          "GFAP","CCNB1"), stacked=T, pt.size = 0, group.by = "celltype2")
+
+
+
+
+
+
+Tumor.CellExperiment <- as.SingleCellExperiment(Tumorcluster2)
+
+
+
+data <- RoeIndex(Tumorcluster2, "State", "celltype2")
+data <- data[-33:-34, ]
+data$Var2 <- factor(data$Var2, levels = c("T cell","NK cell","B cell", 
+                                          "Plasma cell", "Mast cell", 
+                                          "Myeloid cell"))
+
+
+data <- acast(data, Var1 ~ Var2) %>% t()
+bk <- c(seq(0, 0.5, by = 0.01), seq(0.51, 1, by = 0.01))
+
+data <- t(data)
+bk <- c(seq(0.5, 1.5, by = 0.1))
+pl <- pheatmap(data, scale="none",
+               cluster_rows = F,
+               cluster_cols = F,
+               show_rownames = T,
+               show_colnames = T,
+
+               color = c(colorRampPalette(colors = c("#F5F5DC", "#F08080"))(length(bk))),
+               border=NA,
+               fontsize = 10,
+               breaks = bk,
+               display_numbers = TRUE,
+               #annotation_col = group,
+               number_color = "black",
+               fontsize_number = 10,
+               legend_breaks = seq(0.5, 1.5),
+               gaps_row = c(1))
+
+
+VlnPlot(subset(Tumorcluster2, CDH1 > 0), features = "CDH1", split.by = "State")+
+  state_compare_means
+
+
+color = c(colorRampPalette(colors = c("#63B8FF", "#F0F8FF"))(length(bk)/2),
+          colorRampPalette(colors = c("#F0F8FF", "#F08080"))(length(bk)/2)),
+
+
+
+#Roe
+Roe.Bdata <- RoeIndex(Tumorcluster, "State", "RNA_snn_res.0.7")
+
+Roe.Bdata <- acast(Roe.Bdata, Var1 ~ Var2)
+#NSDI
+Relapse <- subset(Tumorcluster2, subset = State == "Relapse")
+NSDI.Bdata <- NSDI(Relapse$seurat_clusters, Relapse$patientID)
+
+
+NSDI.Bdata <- NSDI.Bdata[ ,-17]
+
+
+NSDI.Bdata <- rbind(Roe.Bdata, NSDI.Bdata)
+pl <- pheatmap(NSDI.Bdata, scale="none",
+               cluster_rows = F,
+               cluster_cols = T,
+               show_rownames = T,
+               show_colnames = T,
+               border=NA,
+               fontsize = 10,
+               
+               display_numbers = TRUE,
+               color = c(colorRampPalette(colors = c("#5CACEE", "#F5FFFA"))(length(bk)/2),
+                         colorRampPalette(colors = c("#F5FFFA", "#F08080"))(length(bk)/2)),
+               #annotation_col = group,
+               number_color = "black",
+               fontsize_number = 10)
+
+
+
+NSDI.Bdata <- NSDI(Relapse$seurat_clusters, Relapse$patientID)
+
+
+NSDI.Bdata <- t(NSDI.Bdata) %>% data.frame()
+
+
+
+
+
+
+
+clusterscolor <- c("#79CDCD","#45a776","#f05326","#eed777","#0780cf","#b3974e",
+                   "#38cb7d","#ddae33","#844bb3","#93c555","#5f6694","#df3881",
+                   "#0780cf","#765005","#fa6d1d","#0e2c82")
+names(clusterscolor) <- as.character(0:15)
+
+
+
+
+NSDI.Bdata$clusters <- NSDI.Bdata %>% row.names()
+ggplot(NSDI.Bdata, aes(x = reorder(clusters, NSDI.Bdata), y = NSDI.Bdata, fill = clusters)) + geom_bar(stat="identity")+
+  scale_fill_manual(values = clusterscolor)+
+  guides(fill = "none")+
+  ylab("Normalized Shannon diversity index")+
+  xlab("Seurat clusters")+
+  scale_y_continuous(expand = c(0,0), limits = c(0, 0.5))+
+  generaltheme1()
+
+
+
+
+
+DimPlot(Tumorcluster2, group.by = "seurat_clusters")+
+  scale_color_manual(values = c("#79CDCD","#45a776","#f05326","#eed777","#0780cf","#b3974e",
+                               "#38cb7d","#ddae33","#844bb3","#93c555","#5f6694","#df3881",
+                               "#0780cf","#765005","#fa6d1d","#0e2c82","#b6b51f","#da1f18",
+                               "#701866","#f47a75","#009db2","#024b51","#63b2ee","#76da91",
+                               "#f8cb7f","#f89588","#7cd6cf","#9192ab","#7898e1","#efa666",
+                               "#eddd86","#9987ce","#90ed7d"))+
+  generaltheme1()
+
+
+
+
+
+
+Tumorcluster2$seurat_clusters %>% table()
+
+
+
+
+NSDI.Bdata
+
+
+
+
+Tumorcluster$patientID <- "id"
+Tumorcluster$patientID[Tumorcluster2$orig.ident == "Guoshaozhou1119_S"] <- "PA1"
+Tumorcluster$patientID[Tumorcluster2$orig.ident == "SJ_S"] <- "PA2"
+Tumorcluster$patientID[Tumorcluster2$orig.ident == "SJ211.19_S"] <- "PA3"
+Tumorcluster$patientID[Tumorcluster2$orig.ident == "SF11644"] <- "PA4"
+Tumorcluster$patientID[Tumorcluster2$orig.ident == "SF11956"] <- "PA5"
+Tumorcluster$patientID[Tumorcluster2$orig.ident == "SF11979"] <- "PA6"
+
+Tumorcluster$State <- "state"
+Tumorcluster$State[Tumorcluster2$patientID == "PA1" | Tumorcluster2$patientID == "PA2" | Tumorcluster2$patientID == "PA3"] <- "Relapse"
+Tumorcluster$State[Tumorcluster2$patientID == "PA4" | Tumorcluster2$patientID == "PA5" | Tumorcluster2$patientID == "PA6"] <- "Primary"
+
+
+Roe.Bdata <- RoeIndex(Tumorcluster, "State", "seurat_clusters")
+
+
+
+
+DotPlot(Tumorcluster, features = c("FABP5"))
+
+c('CDH1','CD24','EPCAM','POU5F1','SOX2','SALL4','GLIS1','MYC','BCL2','KLF4')
+
+
+
+
+
+
+
+
+FeaturePlot(Tumorcluster2, features = c("CCNB1"))+
+  generaltheme1()
+
+FeaturePlot(Tumorcluster2, features = c("MKI67"))+
+  generaltheme1()
+
+FeaturePlot(Tumorcluster2, features = c("UBE2C"))+
+  generaltheme1()
+
+FeaturePlot(Tumorcluster2, features = c("S100A6"))+
+  generaltheme1()
+
+Idents(Tumorcluster2) <- "seurat_clusters"
+
+Tumorcluster2Markers <- FindAllMarkers(Tumorcluster2, only.pos = TRUE, min.pct = 0.25, logfc.threshold = 0.25)
+write.table(Tumorcluster2Markers, 
+            file="Tumorcluste2rMarkers.txt", 
+            sep = '\t', 
+            row.names = TRUE, 
+            col.names = TRUE, 
+            quote = FALSE)
+
+
+
+FeaturePlot(Tumorcluster2, features = "VEGFA")+
+  generaltheme1()
+
+
+
+plot_density(Tumorcluster2, reduction = "umap", "VEGFA")
+
+
+
+plot_density(scedata, c("CD4","CD8A"),joint = TRUE)
+
+
+
+
+
+
+
