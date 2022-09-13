@@ -1,0 +1,235 @@
+data <- Tumorcluster2@meta.data
+# 分组箱型统计图
+e1 <- ggplot(data, aes(x = Var1, y = Freq, fill = cliType))+ 
+  geom_boxplot(position=position_dodge(1),width=0.7)+
+  labs(x = "CellType", y = "Frequence")+
+  theme_classic()+
+  theme(axis.text.x = element_text(size = 10,angle = 45,hjust = 1))+
+  stat_compare_means(label = 'p.signif', hide.ns = T)+
+  scale_fill_d3()
+e1
+
+
+
+data <- table(data$celltype2, data$orig.ident) %>% prop.table(.,2) %>% data.frame()
+data <- data[-which(data$Var1 == 16),]
+data$cliType <- "recurrence"
+data$cliType[which(data$Var2 %in% c("SF11644","SF11956","SF11979"))] <- "primary"
+
+DimPlot(Tumorcluster2, reduction = "umap", label = T, group.by = "seurat_clusters")+
+  scale_color_manual(values = c("#79CDCD","#45a776","#f05326","#eed777","#334f65","#b3974e",
+                                "#38cb7d","#ddae33","#844bb3","#93c555","#5f6694","#df3881",
+                                "#0780cf","#765005","#fa6d1d","#0e2c82","#90ed7d","#da1f18",
+                                "#701866","#f47a75","#009db2","#024b51","#63b2ee","#76da91",
+                                "#f8cb7f","#f89588","#7cd6cf","#9192ab","#7898e1","#efa666",
+                                "#eddd86","#9987ce","#90ed7d"))
+
+# celltype2 
+DimPlot(Tumorcluster2, reduction = "umap", label = F, group.by = "seurat_clusters")+
+  scale_color_manual(values = c("#79CDCD","#45a776","#f05326","#eed777","#334f65","#b3974e",
+                                "#38cb7d","#ddae33","#844bb3","#93c555","#5f6694","#df3881",
+                                "#0780cf","#765005","#fa6d1d","#0e2c82","#90ed7d","#da1f18",
+                                "#701866","#f47a75","#009db2","#024b51","#63b2ee","#76da91",
+                                "#f8cb7f","#f89588","#7cd6cf","#9192ab","#7898e1","#efa666",
+                                "#eddd86","#9987ce","#90ed7d"))
+
+Tumorcluster$orig.ident%>%table()
+
+DimPlot(Merge)
+
+DotPlot(Tumorcluster2, features = c("S100A4","VEGFA","HIF1A","CDKN1A","PNRC1","TNFAIP3","BTG1","JUN","DUSP1"))
+
+Hypoxia <- c("HIF1A","CDKN1A","PNRC1","TNFAIP3","BTG1","JUN","DUSP1")
+gene <- list(Hypoxia = Hypoxia)
+Tumorcluster2 <- AddModuleScore(
+  object = Tumorcluster2,
+  features = gene,
+  ctrl = 100, #默认值是100
+  name = 'Hypoxia_Features'
+)
+
+
+Tumorcluster2$Hypoxia_Features1
+
+
+library(ggplot2)
+mydata<- FetchData(Tumorcluster2,vars = c("UMAP_1","UMAP_2","Hypoxia_Features1"))
+a <- ggplot(mydata,aes(x = UMAP_1,y =UMAP_2,colour = Hypoxia_Features1))+geom_point(size = 1)+scale_color_gradientn(values = seq(0,1,0.2),colours = c('blue','cyan','green','yellow','orange','red'))
+
+a+ theme_bw() + theme(panel.border = element_blank(), panel.grid.major = element_blank(),
+                      panel.grid.minor = element_blank(), axis.line = element_line(colour = "black"))
+
+VlnPlot(Tumorcluster2,features = 'Hypoxia_Features1')
+
+data<- FetchData(Tumorcluster2,vars = c("seurat_clusters","Hypoxia_Features1","cliType"))
+p <- ggplot(data,aes(seurat_clusters,Hypoxia_Features1, fill=cliType))+
+  theme_classic()+
+  xlab("Hypoxia pathway enrichment score")+
+  ylab("Seurat clusters")
+p+geom_boxplot()+theme_bw()+RotatedAxis()
+
+
+primaryrecurrencemarker <- FindMarkers(Tumorcluster2, ident.1 = "primary", ident.2 = "recurrence", group.by = 'cliType')
+
+data("pbmc_small")
+
+
+
+VlnPlot(subset(Tumorcluster2,VEGFA>0) , features = "VEGFA", split.by = "cliType")+
+  scale_fill_d3()+
+  stat_compare_means(label = 'p.signif', hide.ns = T)
+
+VlnPlot(subset(Tumorcluster2,VEGFA>0) , features = "VEGFA", split.by = "cliType")+
+  scale_fill_d3()+
+  stat_compare_means(label = 'p.signif', hide.ns = T)
+
+
+VlnPlot(Tumorcluster2, , features = "ENPP4", split.by = "cliType")+
+  scale_fill_d3()+
+  stat_compare_means(label = 'p.signif', hide.ns = T)
+  
+DotPlot(subset(Tumorcluster2, SOX2 > 0) , features = "SOX2", group.by = "celltype2")+
+  scale_fill_d3()+
+  stat_compare_means(label = 'p.signif', hide.ns = T)
+
+VlnPlot(Tumorcluster2, features = "SOX4", split.by = "cliType",group.by = "celltype2")+
+  scale_fill_d3()+
+  stat_compare_means(label = 'p.signif', hide.ns = T)
+
+
+FeaturePlot(Tumorcluster, features = "IGFBP5")
+TumorclusterMarkers <- FindAllMarkers(Tumorcluster, only.pos = TRUE, min.pct = 0.25, logfc.threshold = 0.25)
+write.table(TumorclusterMarkers, 
+            file="TumorclusterMarkers.txt", 
+            sep = '\t', 
+            row.names = TRUE, 
+            col.names = TRUE, 
+            quote = FALSE)
+
+,"RNASE2","ARPC4"
+
+Tumorcluster2
+
+
+DotPlot(Tumorcluster2, features = c("S100A4"))+
+  scale_color_material("purple")
+
+
+
+FeaturePlot(Tumorcluster2, features = c("S100A4"))+
+  scale_color_material("purple")
+
+FeaturePlot(Tumorcluster, features = "PTPRC")
+
+
+
+
+Dim
+
+
+
+
+
+
+
+phylum.gg$group <- c(rep('M', 30), rep('L', 40), rep('C', 40))
+
+ggplot(data, aes(x = Var2, y = Freq, fill = Var1))+ 
+  geom_col(position = 'stack', width = 0.6) +
+  facet_wrap(~cliType, scales = 'free_x', ncol = 3) +
+  scale_fill_manual(values =  c("#79CDCD","#45a776","#f05326","#eed777","#334f65","#b3974e",
+                                "#38cb7d","#ddae33","#844bb3","#93c555","#5f6694","#df3881",
+                                "#0780cf","#765005","#fa6d1d","#0e2c82","#90ed7d","#da1f18",
+                                "#701866","#f47a75","#009db2","#024b51","#63b2ee","#76da91",
+                                "#f8cb7f","#f89588","#7cd6cf","#9192ab","#7898e1","#efa666",
+                                "#eddd86","#9987ce","#90ed7d"))+
+  labs(x = '', y = 'Relative Abundance(%)') +
+  theme(panel.grid = element_blank(), panel.background = element_rect(color = 'black', fill = 'transparent'), strip.text = element_text(size = 12)) +
+  theme(axis.text = element_text(size = 11), axis.title = element_text(size = 13), legend.text = element_text(size = 11, face='italic'))
+  scale_y_continuous(expand = c(0,0))
+
+DefaultAssay(Immunecell) <- "RNA"
+Immunecell <- subset(Merge, subset = celltype1 == "Immune cell")
+Immunecell <- NormalizeData(Immunecell, normalization.method = "LogNormalize", scale.factor = 10000)
+Immunecell <- FindVariableFeatures(Immunecell, selection.method = "vst", nfeatures = 2000)
+Immunecell <- ScaleData(Immunecell)
+Immunecell <- RunHarmony(Immunecell, "orig.ident")
+ElbowPlot(Immunecell,ndims = 30)
+Immunecell <- Immunecell %>% 
+  RunUMAP(reduction = "harmony", dims = 1:21) %>% 
+  FindNeighbors(reduction = "harmony", dims = 1:21) %>% 
+  FindClusters(resolution = 0.7)
+
+DimPlot(Immunecell, reduction = "umap", label = F, group.by = "seurat_clusters")+
+  scale_color_manual(values = c("#79CDCD","#45a776","#f05326","#eed777","#334f65","#b3974e",
+                                "#38cb7d","#ddae33","#844bb3","#93c555","#5f6694","#df3881",
+                                "#0780cf","#765005","#fa6d1d","#0e2c82","#90ed7d","#da1f18",
+                                "#701866","#f47a75","#009db2","#024b51","#63b2ee","#76da91",
+                                "#f8cb7f","#f89588","#7cd6cf","#9192ab","#7898e1","#efa666",
+                                "#eddd86","#9987ce","#90ed7d"))
+DotPlot(Immunecell, features = macrophage_fea)
+macrophage_fea <- c("APOE","APOC1","C1QC","CD14","C1QA","CD4","IBA1",
+                    "CLEC10A","CLEC9A")
+
+
+
+
+
+
+
+
+
+
+
+
+data <- Immunecell@meta.data
+data <- table(data$seurat_clusters, data$orig.ident) %>% prop.table(.,2) %>% data.frame()
+data <- data[-which(data$Var1 == 16),]
+data$cliType <- "recurrence"
+data$cliType[which(data$Var2 %in% c("SF11644","SF11956","SF11979"))] <- "primary"
+# 分组箱型统计图
+e1 <- ggplot(data, aes(x = Var1, y = Freq, fill = cliType))+ 
+  geom_boxplot(position=position_dodge(1),width=0.7)+
+  labs(x = "CellType", y = "Frequence")+
+  theme_classic()+
+  theme(axis.text.x = element_text(size = 10,angle = 45,hjust = 1))+
+  stat_compare_means(label = 'p.signif', hide.ns = T)+
+  scale_fill_d3()
+e1
+
+
+
+
+ImmuneclusterMarkers <- FindAllMarkers(Immunecell, only.pos = TRUE, min.pct = 0.25, logfc.threshold = 0.25)
+write.table(ImmuneclusterMarkers, 
+            file="ImmuneclusterMarkers.txt", 
+            sep = '\t', 
+            row.names = TRUE, 
+            col.names = TRUE, 
+            quote = FALSE)
+
+
+DefaultAssay(Immunecell) <- "RNA"
+DotPlot(Immunecell, features = c("C1QC","CCL3L1","EREG","DNAJB1","WDR74","VCAN"))
+
+
+DotPlot(Immunecell, features = c("C1QC","CD68","CD163","HLA-DPB1","CST3","CD14","LYZ"))
+
+Immunecell$celltype2[Tumorcluster2$seurat_clusters == 0] <- "Macrophage_C1QC"
+Immunecell$celltype2[Tumorcluster2$seurat_clusters == 1] <- "Macrophage_C1QC"
+Immunecell$celltype2[Tumorcluster2$seurat_clusters == 2] <- "Macrophage_C1QC"
+Immunecell$celltype2[Tumorcluster2$seurat_clusters == 3] <- "Macrophage_C1QC"
+Immunecell$celltype2[Tumorcluster2$seurat_clusters == 4] <- "Macrophage_C1QC"
+Immunecell$celltype2[Tumorcluster2$seurat_clusters == 5] <- "Macrophage_C1QC"
+Immunecell$celltype2[Tumorcluster2$seurat_clusters == 6] <- "Macrophage_C1QC"
+Immunecell$celltype2[Tumorcluster2$seurat_clusters == 7] <- "Macrophage_C1QC"
+Immunecell$celltype2[Tumorcluster2$seurat_clusters == 8] <- "Macrophage_C1QC"
+Immunecell$celltype2[Tumorcluster2$seurat_clusters == 9] <- "Dividing OPC"
+Immunecell$celltype2[Tumorcluster2$seurat_clusters == 10] <- "Macrophage_C1QC"
+
+
+
+FeaturePlot(Immunecell, features = c("CLEC2D"))
+
+
+
