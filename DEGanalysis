@@ -1,0 +1,17 @@
+library(Seurat)
+cliTypeDEGs <- FindMarkers(Tumorcluster, ident.1 = "recurrence", ident.2 = "primary", group.by = "cliType")
+cliTypeDEGs$Genes <- rownames(cliTypeDEGs)
+
+write.table(cliTypeDEGs, "cliTypeDEGs.txt", col.names = T, row.names = F, quote = F, sep = "\t")
+
+Tumorcluster$seurat_clusters %>% table()
+
+
+DoHeatmap(object = Tumorcluster, features = cliTypeDEGs$Genes[order(cliTypeDEGs$avg_log2FC, decreasing = T)], group.by = "cliType") 
+
+
+Genes <- c("VEGFA", cliTypeDEGs$Genes[order(cliTypeDEGs$avg_log2FC, decreasing = T)][c(1:25, )])
+DoHeatmap(object = Tumorcluster, features = , group.by = "cliType") 
+
+
+which(cliTypeDEGs$Genes[order(cliTypeDEGs$avg_log2FC, decreasing = T)] == "VEGFA")
