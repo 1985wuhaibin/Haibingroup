@@ -1,0 +1,174 @@
+# Single-Cell-RNA-Sequencing-Reveals-Influences-of-Tumor-Heterogeneity-and-Microenvironment-in-Recurre
+DefaultAssay(test.merge) <- "RNA"
+library(ggplot2)
+fill_colors <- c("#20B2AA", "#CD4F39", "#EE3A8C", "#008B00", "#6CA6CD", 
+                 "#6959CD", "#C6E2FF", "#FFA54F", "#FF7F00", "#B452CD", 
+                 "#436EEE", "#9BCD9B", "#F08080", "#FF3030", "#FFEC8B", 
+                 "#AB82FF", "#9ACD32", "#636363", "#B8860B", "#5D478B", 
+                 "#8B3626", "#FF6347", "#40E0D0","#FFFF00")
+FeaturePlot(test.merge, reduction = "umap", features = "PTPRC")
+# Seurat_clusters
+DimPlot(test.merge, reduction = "umap", label = TRUE)+
+  scale_fill_manual(values = fill_colors) +
+  scale_color_manual(values = fill_colors, guide = FALSE)
+# Patient
+DimPlot(test.merge, reduction = "umap",group.by = "orig.ident")+
+  scale_fill_manual(values = fill_colors) +
+  scale_color_manual(values = fill_colors, guide = FALSE)
+# Annotation
+DefaultAssay(NewMerge) <- "RNA"
+# immune_cell >>>>>>>>>>>>> 19
+T_fea <- c("CD2","CD3E","CD3G","CD8E","CD8A","CD247","CD25","ILI2RA","IKZF2")
+FeaturePlot(test.merge, features = c("S100A8","S100A9","S100A12"), reduction = 'tsne')
+DotPlot(test.merge, features = c("CD3E","CD3D","CST3","S100A8",
+                                 "S100A9","S100A12","IL32"), group.by = "seurat_clusters")
+
+FeaturePlot(test.merge, features = T_fea, reduction = 'umap')
+DotPlot(test.merge, features = "PTPRC", group.by = "seurat_clusters")
+# immune>>>>>>>>>20????
+immune_fea <- c("EGFR")
+FeaturePlot(test.merge, reduction = 'umap', features = c("PTPRC","IL32"))
+FeaturePlot(test.merge, reduction = 'umap', features = c("PTPRC","CST3"))
+DotPlot(test.merge, features = "PTPRC", group.by = "seurat_clusters")
+
+# macrophage >>>>>>>> 1,3,13,21
+macrophage_fea <- c("APOE","APOC1","C1QC","CD14","C1QA","CD4","IBA1",
+                    "CLEC10A","CLEC9A")
+FeaturePlot(test.merge, reduction = 'umap', features = macrophage_fea)
+DotPlot(test.merge, features = macrophage_fea, group.by = "seurat_clusters")
+
+# Endothelial >>>>>>>> 20
+Fibroblast_fea <- c("CD34","PECAM1","CDH5","VWF","COL1A2","COL3A1","COL1A1","COL6A2","DCN","COL6A3","COL6A1","COL5A2")
+FeaturePlot(test.merge, features = Fibroblast_fea)
+DotPlot(test.merge, features = Fibroblast_fea, group.by = "seurat_clusters")
+
+# Oligodendrocytes >>>>>> 2,4,12,14,???????0
+oligodendrocytes_features <- c("MBP", "TF", "PLP1", "MAG", "MOG", "CLDN11")
+FeaturePlot(NewMerge, reduction = 'tsne', features = oligodendrocytes_features)
+DotPlot(NewMerge, features = oligodendrocytes_features, group.by = "seurat_clusters")
+
+# Astrocyte >>>>>>>>> 0,6,7,16
+Astrocyte_features <- c("GFAP","AB416")
+FeaturePlot(test.merge, reduction = 'tsne', features = Astrocyte_features)
+DotPlot(test.merge, features = Astrocyte_features, group.by = "seurat_clusters")
+
+# CD8+ T_cell >>>>>>>>>> ????????
+CD8_T <- c("IFIT3","ISG15","IFIT1","IFIT2","RSAD2","CD8A","MX1","MT2A","CD8B","GZMH","GZMA","CCL5")
+CD8_T <- c("CD3","CD25","CD8")
+FeaturePlot(NewMerge, reduction = 'tsne', features = "IFIT2")
+DotPlot(NewMerge, features = "PTPRC", group.by = "seurat_clusters")
+
+#OPC >>>>>>> 11,8
+OPC_fea <- c("SCG3","PDGFRA","RBP1")
+FeaturePlot(NewMerge, reduction = 'tsne', features = OPC_fea)
+DotPlot(NewMerge, features = OPC_fea, group.by = "seurat_clusters")
+
+
+# Radial Glia >>>>>>> 6,?16
+Radial_Glia <- c("SPARCL1","AQP4")
+FeaturePlot(test.merge, reduction = 'tsne', features = Radial_Glia)
+DotPlot(test.merge, features = Radial_Glia, group.by = "seurat_clusters")
+
+# Dividing Neuron >>>>>>>>>>>>> 10,18
+Dividing_Neuron <- c("TOP2A","NUSAP1","PTTG1","HMGB2")
+FeaturePlot(test.merge, reduction = 'tsne', features = "C3AR1")
+DotPlot(test.merge, features = Dividing_Neuron, group.by = "seurat_clusters")
+
+# 合并之前的注释结果
+test.merge@meta.data <- test.merge@meta.data[ ,-c(8:19)]
+test.merge@meta.data$CellType <- "Type"
+Re_ID <- read.delim("/home/chywang/SingleCellAnalysis/metadata.txt")
+
+# Annotation in metadata
+Pri_anno <- read.delim("Glioma_GSE138794_CellMetainfo_table.tsv")
+# 去除_后的标记,18653开始为原发的数据
+rowID <- gsub("\\_.*", "", rownames(test.merge@meta.data)[18653:30678])
+CellType <- Pri_anno[match(rowID, Pri_anno[ ,1]),5]
+CellType[which(CellType == "Mono/Macro")] <- "Macrophage"
+test.merge@meta.data$CellType[18653:30678] <- CellType
+# Plot
+DimPlot(test.merge, reduction = "umap",group.by = "CellType")+
+  scale_fill_manual(values = fill_colors) +
+  scale_color_manual(values = fill_colors, guide = FALSE)
+
+test.merge@meta.data$CellType[which(test.merge@meta.data$seurat_clusters == 19)] <- 
+  "Immune Cells"
+
+
+test.merge@meta.data$CellType[which(test.merge@meta.data$seurat_clusters == 1)] <- 
+  "Macrophage"
+test.merge@meta.data$CellType[which(test.merge@meta.data$seurat_clusters == 3)] <- 
+  "Macrophage"
+test.merge@meta.data$CellType[which(test.merge@meta.data$seurat_clusters == 13)] <- 
+  "Macrophage"
+test.merge@meta.data$CellType[which(test.merge@meta.data$seurat_clusters == 21)] <- 
+  "Macrophage"
+
+test.merge@meta.data$CellType[which(test.merge@meta.data$seurat_clusters != 1 & 
+                                      test.merge@meta.data$CellType == "Macrophage")] <- "Malignant"
+
+
+test.merge@meta.data$CellType[which(test.merge@meta.data$seurat_clusters != 1 & 
+                                      test.merge@meta.data$CellType == "Macrophage")] <- "Malignant"
+test.merge@meta.data$CellType[which(test.merge@meta.data$seurat_clusters != 3 & 
+                                      test.merge@meta.data$CellType == "Macrophage")] <- "Malignant"
+test.merge@meta.data$CellType[which(test.merge@meta.data$seurat_clusters != 13 & 
+                                      test.merge@meta.data$CellType == "Macrophage")] <- "Malignant"
+test.merge@meta.data$CellType[which(test.merge@meta.data$seurat_clusters != 19 & 
+                                      test.merge@meta.data$CellType == "Macrophage")] <- "Malignant"
+
+test.merge@meta.data$CellType[which(test.merge@meta.data$seurat_clusters != 21 & 
+                                      test.merge@meta.data$CellType == "Macrophage")] <- "Malignant"
+
+test.merge@meta.data$CellType[which(test.merge@meta.data$seurat_clusters == 11)] <- 
+  "Malignant"
+
+test.merge@meta.data$CellType[which(test.merge@meta.data$seurat_clusters == 1)] <- 
+  "Macrophage"
+test.merge@meta.data$CellType[which(test.merge@meta.data$seurat_clusters == 3)] <- 
+  "Macrophage"
+test.merge@meta.data$CellType[which(test.merge@meta.data$seurat_clusters == 13)] <- 
+  "Macrophage"
+test.merge@meta.data$CellType[which(test.merge@meta.data$seurat_clusters == 21)] <- 
+  "Macrophage"
+data <- test.merge@meta.data
+data[ ,1] <- factor(data[ ,1], levels = c("SF11644", "SF11956", "SF11977",
+                                          "SF11979","Guoshaozhou1119_S", "SJ211.19_S",
+                                          "ZMM_S"))
+# Cellfraction Plot
+ggplot(data, aes(orig.ident)) + geom_bar(aes(fill=CellType), position="fill")+
+  ggtitle("")+
+  theme_bw()+
+  theme(axis.ticks.length=unit(0.5,'cm'))+
+  guides(fill=guide_legend(title=NULL))+
+  scale_fill_manual(values=wes_palette(9, name = "Royal1", type = "continuous"))
+
+
+# immune cell
+immune_cluster <- subset(test.merge, subset = seurat_clusters == c(1,5,11,18,20,21))
+immune_cluster <- immune_cluster %>%
+  Seurat::NormalizeData() %>%
+  FindVariableFeatures(selection.method = "vst", nfeatures = 2000) %>% 
+  ScaleData()
+immune_cluster <- RunPCA(immune_cluster, npcs = 50, verbose = FALSE)
+immune_cluster <- RunUMAP(immune_cluster, dims = 1:30)
+immune_cluster <- FindNeighbors(immune_cluster, dims = 1:30)
+immune_cluster <- FindClusters(immune_cluster, resolution = 0.5)
+DimPlot(immune_cluster, reduction = "umap", label = TRUE)+
+  scale_fill_manual(values = fill_colors) +
+  scale_color_manual(values = fill_colors, guide = FALSE)
+# Patient
+DimPlot(immune_cluster, reduction = "umap",group.by = "orig.ident")+
+  scale_fill_manual(values = fill_colors) +
+  scale_color_manual(values = fill_colors, guide = FALSE)
+
+FeaturePlot(immune_cluster, reduction = 'umap', features = "ENTPD1")
+VlnPlot(immune_cluster, features = "MARCKS", group.by = "orig.ident")
+
+immune_batch <- immune_cluster %>% 
+  RunHarmony("orig.ident", plot_convergence = TRUE)
+
+
+VlnPlot(test.merge, features = "CD274", group.by = "orig.ident")
+RidgePlot(test.merge, features = "CD274", group.by = "orig.ident")
+VlnPlot(test.merge, "CD279", group.by = "orig.ident")+ theme_bw()
