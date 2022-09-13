@@ -1,0 +1,95 @@
+# load library
+library(msigdbr)
+library(clusterProfiler)
+library(org.Hs.eg.db)
+# 提取C6库
+m_t2g <- msigdbr(species = "Homo sapiens", category = "C6") %>% 
+  dplyr::select(gs_name, entrez_gene)
+head(m_t2g)
+
+marker <- primaryrecurrencemarker[order(primaryrecurrencemarker$avg_log2FC), ] %>% rownames()
+eg <- bitr(marker, fromType="SYMBOL", toType=c("ENTREZID","ENSEMBL"), 
+           OrgDb="org.Hs.eg.db")
+em <- enricher(eg[ ,2], TERM2GENE=m_t2g)
+dotplot(em)
+
+# KEGG
+upmarker <- rownames(primaryrecurrencemarker[primaryrecurrencemarker$p_val_adj <= 0.05 & primaryrecurrencemarker$avg_log2FC < 0, ])
+downmarker <- rownames(primaryrecurrencemarker[primaryrecurrencemarker$p_val_adj <= 0.05 & primaryrecurrencemarker$avg_log2FC > 0, ])
+eg <- bitr(upmarker, fromType="SYMBOL", toType=c("ENTREZID","ENSEMBL"), 
+           OrgDb="org.Hs.eg.db")
+ego <- enrichKEGG(
+  gene          = eg[ ,2],
+  keyType     = "kegg",
+  organism   = 'hsa',
+  pvalueCutoff      = 0.05,
+  pAdjustMethod     = "BH",
+  qvalueCutoff  = 0.05
+)
+dotplot(ego)
+
+# go
+ego <- enrichGO(
+  gene          = eg[ ,2],
+  keyType = "ENTREZID",
+  OrgDb         = org.Hs.eg.db,
+  ont = "all",
+  pAdjustMethod = "BH",
+  pvalueCutoff  = 0.01,
+  qvalueCutoff  = 0.05,
+  readable      = TRUE)
+
+
+barplot(ego,drop = TRUE,showCategory = 5,split = "ONTOLOGY")+
+  facet_grid(ONTOLOGY~.,scale = 'free')
+
+
+BBB <- list(bbb = c("TJP1","TJP2","CDC45","MFSD2A","ABCC8","WNK3","BDKRB2","CLDN5","VEGFA"))
+Tumorcluster2 <- AddModuleScore(
+  object = Tumorcluster2 ,
+  features = NFKB,
+  ctrl = 100, #默认值是100
+  name = 'NFKB_Features'
+)
+
+
+MGMT <- list(c("CCL2", "CLTCL1", "CNTNAP1", "CTNNAL1", "GCM1", "GNRHR", "GOLGA4", "GPR65", "PIK3R3", "SLC10A1", "SLC16A2", "SLC6A2", "SMARCD1", "SMPD2", "SNAPC1", "SNAPC3", "SNRPB2", "TUBB", "UGT8"))
+
+NFKB <- list(c("CHUK", "FADD", "IKBKB", "IKBKG", "IL1A", "IL1R1", "MAP3K1", "MAP3K14", "MAP3K7", "MYD88", "NFKB1", "NFKBIA", "RELA", "RIPK1", "TAB1", "TNF", "TNFAIP3", "TNFRSF1A", "TNFRSF1B", "TRADD", "TRAF6")
+)
+
+hypoxia <- list(c("ARNT","EIF1","EIF1AX","EIF2B1","EIF2B2","EIF2B3","EIF2B4","EIF2B5","EIF2S1","EIF2S2","EIF2S3","ELAVL1","FLT1",
+                  "FLT4","HIF1A","HRAS","KDR","NOS3","PIK3CA","PIK3CG","PIK3R1","PLCG1","PRKCA","PRKCB","SHC1","VEGFA", "VHL"))
+
+VlnPlot(Tumorcluster2, features  = "BBB_Features1", )
+
+
+
+data<- FetchData(Tumorcluster2,vars = c("seurat_clusters","NFKB_Features1","cliType"))
+p <- ggplot(data,aes(seurat_clusters,NFKB_Features1,fill=cliType))
+p+geom_boxplot()+theme_bw()+RotatedAxis()+scale_fill_aaas()+
+  stat_compare_means(method = "wilcox.test", label = "p.signif", hide.ns = T)+
+  xlab("Seurat clusters")+
+  ylab("NF-κB enrichment score")
+
+
+
+mycolor <- c("#79CDCD", "#45a776", "#f05326", "#eed777", "#334f65", "#b3974e",
+             "#38cb7d", "#ddae33", "#844bb3", "#93c555", "#5f6694", "#df3881",
+             "#0780cf", "#765005", "#fa6d1d", "#0e2c82", "#b6b51f", "#da1f18",
+             "#701866", "#f47a75", "#009db2", "#024b51", "#63b2ee", "#76da91",
+             "#f8cb7f", "#f89588", "#7cd6cf", "#9192ab", "#7898e1", "#efa666",
+             "#eddd86", "#9987ce")
+
+DimPlot(Tumorcluster2, group.by = "seurat_clusters")+
+  scale_color_manual(values = mycolor)+
+  labs(title = "")
+  
+  
+
+VlnPlot(subset(Tumorcluster2,MGMT>0), features = "MGMT", group.by = "cliType")+
+  stat_compare_means(method = "wilcox.test", label = "p.signif", hide.ns = T)
+
+
+
+
